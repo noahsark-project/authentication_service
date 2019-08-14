@@ -4,7 +4,9 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo')(session);
-const registryRouter = require('./routers/registryRouter');
+const userRouter = require('./routers/userRouter');
+const oauthRouter = require('./routers/oauthRouter');
+const oauth = require('./middlewares/oauth/oauthServer');
 const router = express.Router();
 
 const app = express();
@@ -19,8 +21,8 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     store: new MongoStore({
-      url: 'mongodb://127.0.0.1:27017/session', //数据库的地址  student是数据库名
-      touchAfter: 24 * 3600 //time period in seconds
+      url: 'mongodb://127.0.0.1:27017/session',
+      touchAfter: 24 * 3600
     })
   }));
 
@@ -31,8 +33,13 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 
-app.use('/registry', registryRouter);
 
+app.use('/oauth',oauthRouter);
+app.use('/api/v1/users', userRouter);
+
+app.get('/secure', oauth.authenticate, (req, res) => {
+  res.json({ message: 'Secure data' });
+});
 
 app.use((req, res, next) => {
     const err = new Error('Not Found');

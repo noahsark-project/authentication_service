@@ -1,11 +1,11 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
 const router = express.Router();
-const registryController = require('../controllers/registryController');
+const userController = require('../controllers/userController');
 
 router.post('/',
     [
-        check('email').isEmail(),
+        check('username').isAlphanumeric().isLength({min:3}),
         check('password').isAlphanumeric().isLength({min:6})
     ],async (req, res)=>{
         const errors = validationResult(req);
@@ -13,7 +13,7 @@ router.post('/',
             return res.status(422).json({ errors: errors.array() });
         }
         try{
-            const newUser = await registryController.registry(req.body.email,req.body.password,req.body.nickname);
+            const newUser = await userController.create(req.body.username,req.body.password);
             res.json(newUser);
         }catch(e){
             if(e.code === 804){
