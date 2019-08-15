@@ -12,7 +12,7 @@ router.get('/authorize', function(req, res, next){
       redirect_uri:req.query.redirect_uri,
       state:req.query.state
     }
-    res.redirect(util.format('/login.html'));
+    res.redirect('/');
   }else{
     next();
   }

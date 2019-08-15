@@ -13,7 +13,8 @@ router.post('/',
             return res.status(422).json({ errors: errors.array() });
         }
         try{
-            const newUser = await userController.create(req.body.username,req.body.password);
+            let scope = req.body.scope ? req.body.scope : ['profile'];
+            const newUser = await userController.create(req.body.username,req.body.password,scope);
             res.json(newUser);
         }catch(e){
             if(e.code === 804){
